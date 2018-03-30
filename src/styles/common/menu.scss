@@ -1,89 +1,67 @@
-.toggleBtn {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 5;
-    cursor: pointer;
-    width: 50px;
-    height: 50px;
+.menu__container {
+    background-color: transparent;
+    position: relative;
+    width: 60px;
+    height: 100vh;
+    float: right;
+    transition: width .3s;
+    z-index: 99;
 }
 
-.toggleBtn span {
-    display: block;
-    width: 40px;
-    height: 5px;
-    background: white;
-    margin: 6px 0px;
-    transition: all 300ms ease-in-out;
-}
-
-.toggleBtn.active span {
-    background: white;
-}
-
-.toggleBtn.active span:nth-child(2) {
-    opacity: 0;
-}
-
-.toggleBtn.active span:nth-child(1) {
-    transform-origin: left;
-    transform: rotate(45deg) translate(8px, -3px);
-}
-
-.toggleBtn.active span:nth-child(3) {
-    transform-origin: left;
-    transform: rotate(-45deg) translate(1px, 15px);
-}
-
-.menu {
-    position: absolute;
-    top: 0px;
-    left: 0px;
+.container.open {
     width: 100vw;
-    height: 100vh;
 }
 
-.menu:before,
-.menu:after {
-    content: "";
+.closeburger {
     position: absolute;
-    top: 0px;
-    width: 0vw;
-    height: 100vh;
-    transition: all 400ms ease-in-out;
-    background: #b94071;
+    top: 20px;
+    left: 10px;
+    height: 30px;
+    width: 30px;
+    cursor: pointer;
 }
 
-.menu:before {
-    left: 0px;
-}
-
-.menu:after {
-    right: 0px;
-}
-
-.menu.active:before,
-.menu.active:after {
-    width: 50vw;
-}
-
-.menu ul {
+.middleburger,
+.closeburger:before,
+.closeburger:after {
     position: absolute;
-    top: -100%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 2;
-    transition: all 400ms ease-in-out 400ms;
+    width: 30px;
+    height: 3px;
+    background-color: #eee;
+    border-radius: 1px;
 }
 
-.menu ul li {
-    list-style: none;
-    font-size: 45px;
-    margin: 5px 0px;
-    color: #fff;
-}
-
-.menu.active ul {
+.middleburger {
     top: 50%;
+    margin-top: -2px;
+    transition: transform ease (500ms);
+}
+
+.closeburger:before {
+    content: '';
+    top: 5px;
+    transition: top 500ms ease 500ms, transform 500ms ease;
+}
+
+.closeburger:after {
+    content: '';
+    bottom: 6px;
+    transition: bottom 500ms ease 500ms, transform 500ms ease;
+}
+
+.open .closeburger .middleburger {
+    transform: rotate(225deg);
+    transition: transform 500ms ease 500ms;
+}
+
+.open .closeburger:before {
+    top: 13px;
+    transform: rotate(225deg);
+    transition: top 500ms ease, transform 500ms ease 500ms;
+}
+
+.open .closeburger:after {
+    bottom: 14px;
+    transform: rotate(-225deg);
+    transition: bottom 500ms ease, transform 500ms ease 500ms;
 }

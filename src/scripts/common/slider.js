@@ -1,137 +1,88 @@
-(function() {
-    // Carousel variables
-    var carouselContent,
-        carouselIndex,
-        carouselLength,
-        firstClone,
-        firstItem,
-        isAnimating,
-        itemWidth,
-        lastClone,
-        lastItem;
+const slider = function() {
+    return {
+        init: function() {
+            $(".slider").each(function() {
+                var $this = $(this);
+                var $group = $this.find(".slide_group");
+                var $slides = $this.find(".slide");
+                var bulletArray = [];
+                var currentIndex = 0;
+                var timeout;
 
-    carouselContent = $(".carousel__content");
+                function move(newIndex) {
+                    var animateLeft, slideLeft;
 
-    carouselIndex = 0;
+                    advance();
 
-    carouselLength = carouselContent.children().length;
+                    if ($group.is(":animated") || currentIndex === newIndex) {
+                        return;
+                    }
 
-    isAnimating = false;
+                    bulletArray[currentIndex].removeClass("active");
+                    bulletArray[newIndex].addClass("active");
 
-    itemWidth = 100 / carouselLength;
+                    if (newIndex > currentIndex) {
+                        slideLeft = "100%";
+                        animateLeft = "-100%";
+                    } else {
+                        slideLeft = "-100%";
+                        animateLeft = "100%";
+                    }
 
-    firstItem = $(carouselContent.children()[0]);
-
-    lastItem = $(carouselContent.children()[carouselLength - 1]);
-
-    firstClone = null;
-
-    lastClone = null;
-
-    // Apply the 3D transformations to avoid a white blink when you slide for the first time
-    carouselContent.css("width", carouselLength * 100 + "%");
-
-    carouselContent.transition({
-            x: `${carouselIndex * -itemWidth}%`
-        },
-        0
-    );
-
-    $.each(carouselContent.children(), function() {
-        return $(this).css("width", itemWidth + "%");
-    });
-
-    // Click on the "Previous" button
-    $(".nav--left").on("click", function() {
-        if (isAnimating) {
-            return;
-        }
-        isAnimating = true;
-        carouselIndex--;
-        if (carouselIndex === -1) {
-            lastItem.prependTo(carouselContent);
-            carouselContent.transition({
-                    x: `${(carouselIndex + 2) * -itemWidth}%`
-                },
-                0
-            );
-            return carouselContent.transition({
-                    x: `${(carouselIndex + 1) * -itemWidth}%`
-                },
-                1000,
-                "easeInOutExpo",
-                function() {
-                    carouselIndex = carouselLength - 1;
-                    lastItem.appendTo(carouselContent);
-                    carouselContent.transition({
-                            x: `${carouselIndex * -itemWidth}%`
-                        },
-                        0
-                    );
-                    return (isAnimating = false);
-                }
-            );
-        } else {
-            return carouselContent.transition({
-                    x: `${carouselIndex * -itemWidth}%`
-                },
-                1000,
-                "easeInOutExpo",
-                function() {
-                    return (isAnimating = false);
-                }
-            );
-        }
-    });
-
-    // Click on the "Next" button
-    $(".nav--right").on("click", function() {
-        if (isAnimating) {
-            return;
-        }
-        isAnimating = true;
-        carouselIndex++;
-        return carouselContent.transition({
-                x: `${carouselIndex * -itemWidth}%`
-            },
-            1000,
-            "easeInOutExpo",
-            function() {
-                isAnimating = false;
-                if (firstClone) {
-                    carouselIndex = 0;
-                    carouselContent.transition({
-                            x: `${carouselIndex * -itemWidth}%`
-                        },
-                        0
-                    );
-                    firstClone.remove();
-                    firstClone = null;
-                    carouselLength = carouselContent.children().length;
-                    itemWidth = 100 / carouselLength;
-                    carouselContent.css("width", carouselLength * 100 + "%");
-                    $.each(carouselContent.children(), function() {
-                        return $(this).css("width", itemWidth + "%");
+                    $slides.eq(newIndex).css({ display: "block", left: slideLeft });
+                    $group.animate({ left: animateLeft }, function() {
+                        $slides.eq(currentIndex).css({ display: "none" });
+                        $slides.eq(newIndex).css({ left: 0 });
+                        $group.css({ left: 0 });
+                        currentIndex = newIndex;
                     });
-                    return;
                 }
-                if (carouselIndex === carouselLength - 1) {
-                    carouselLength++;
-                    itemWidth = 100 / carouselLength;
-                    firstClone = firstItem.clone();
-                    firstClone.addClass("clone");
-                    firstClone.appendTo(carouselContent);
-                    carouselContent.css("width", carouselLength * 100 + "%");
-                    $.each(carouselContent.children(), function() {
-                        return $(this).css("width", itemWidth + "%");
-                    });
-                    return carouselContent.transition({
-                            x: `${carouselIndex * -itemWidth}%`
-                        },
-                        0
-                    );
+
+                function advance() {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(function() {
+                        if (currentIndex < $slides.length - 1) {
+                            move(currentIndex + 1);
+                        } else {
+                            move(0);
+                        }
+                    }, 4000);
                 }
-            }
-        );
-    });
-}.call(this));
+
+                $(".next_btn").on("click", function() {
+                    if (currentIndex < $slides.length - 1) {
+                        move(currentIndex + 1);
+                    } else {
+                        move(0);
+                    }
+                });
+
+                $(".previous_btn").on("click", function() {
+                    if (currentIndex !== 0) {
+                        move(currentIndex - 1);
+                    } else {
+                        move(3);
+                    }
+                });
+
+                $.each($slides, function(index) {
+                    var $button = $('<a class="slide_btn">&bull;</a>');
+
+                    if (index === currentIndex) {
+                        $button.addClass("active");
+                    }
+                    $button
+                        .on("click", function() {
+                            move(index);
+                        })
+                        .appendTo(".slide_buttons");
+                    bulletArray.push($button);
+                });
+
+                advance();
+            });
+        }
+    };
+};
+
+module.exports = slider;
